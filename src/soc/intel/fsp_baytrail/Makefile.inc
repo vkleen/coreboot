@@ -34,6 +34,7 @@ ramstage-y += tsc_freq.c
 romstage-y += tsc_freq.c
 smm-$(CONFIG_HAVE_SMI_HANDLER) += tsc_freq.c
 ramstage-y += spi.c
+romstage-y += spi.c
 smm-$(CONFIG_HAVE_SMI_HANDLER) += spi.c
 ramstage-y += chip.c
 ramstage-y += iosf.c

@@ -32,3 +32,6 @@ config INTEL_CHIPSET_LOCKDOWN
 	  locked down on each normal boot path (done by either coreboot or payload)
 	  and S3 resume (always done by coreboot). Select this to let coreboot
 	  to do this on normal boot path.
+
+config SOUTHBRIDGE_INTEL_COMMON_SPI
+	def_bool n

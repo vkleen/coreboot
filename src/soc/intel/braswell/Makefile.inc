@@ -14,6 +14,7 @@ romstage-y += lpc_init.c
 romstage-y += memmap.c
 romstage-y += pmutil.c
 romstage-y += tsc_freq.c
+romstage-y += spi.c
 
 ramstage-y += acpi.c
 ramstage-y += chip.c
