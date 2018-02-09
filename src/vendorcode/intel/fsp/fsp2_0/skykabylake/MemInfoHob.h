@@ -170,13 +170,6 @@ typedef struct {
   UINT16 tWTR_S;    ///< Number of tCK cycles for the channel DIMM's minimum internal write to read command delay time for different bank groups.
 } MRC_CH_TIMING;
 
-typedef struct {
-  UINT8 SG;         ///< Number of tCK cycles between transactions in the same bank group.
-  UINT8 DG;         ///< Number of tCK cycles between transactions when switching bank groups.
-  UINT8 DR;         ///< Number of tCK cycles between transactions when switching between Ranks (in the same DIMM).
-  UINT8 DD;         ///< Number of tCK cycles between transactions when switching between DIMMs.
-} MRC_TA_TIMING;
-
 ///
 /// Memory SMBIOS & OC Memory Data Hob
 ///
@@ -207,10 +200,6 @@ typedef struct {
   UINT8             RevisionId;              ///< The PCI revision id of this memory controller.
   UINT8             ChannelCount;            ///< Number of valid channels that exist on the controller.
   CHANNEL_INFO      ChannelInfo[MAX_CH];     ///< The following are channel level definitions.
-  MRC_TA_TIMING     tRd2Rd;                  ///< Read-to-Read   Turn Around Timings
-  MRC_TA_TIMING     tRd2Wr;                  ///< Read-to-Write  Turn Around Timings
-  MRC_TA_TIMING     tWr2Rd;                  ///< Write-to-Read  Turn Around Timings
-  MRC_TA_TIMING     tWr2Wr;                  ///< Write-to-Write Turn Around Timings
 } CONTROLLER_INFO;
 
 typedef struct {
@@ -228,6 +217,7 @@ typedef struct {
   UINT8             ErrorCorrectionType;
 
   SiMrcVersion      Version;
+  UINT32            FreqMax;
   BOOLEAN           EccSupport;
   UINT8             MemoryProfile;
   UINT32            TotalPhysicalMemorySize;
