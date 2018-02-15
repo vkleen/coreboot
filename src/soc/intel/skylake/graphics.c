@@ -20,10 +20,16 @@
 #include <intelblocks/graphics.h>
 #include <soc/intel/common/opregion.h>
 #include <soc/ramstage.h>
+#include <soc/systemagent.h>
 
 uintptr_t fsp_soc_get_igd_bar(void)
 {
 	return graphics_get_memory_base();
+}
+
+u32 map_oprom_vendev(u32 vendev)
+{
+	return SA_IGD_OPROM_VENDEV;
 }
 
 void graphics_soc_init(struct device *dev)
