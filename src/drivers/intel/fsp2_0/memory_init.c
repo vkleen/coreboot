@@ -33,6 +33,7 @@
 #include <symbols.h>
 #include <timestamp.h>
 #include <tpm_lite/tlcl.h>
+#include <program_loading.h>
 #include <security/vboot/vboot_common.h>
 #include <vb2_api.h>
 
@@ -150,12 +151,14 @@ static void do_fsp_post_memory_init(bool s3wake, uint32_t fsp_version)
 
 	/*
 	 * Initialize the TPM, unless the TPM was already initialized
-	 * in verstage and used to verify romstage.
+	 * in verstage and used to verify romstage, or for measured boot.
 	 */
 	if (IS_ENABLED(CONFIG_LPC_TPM) &&
-	    (!IS_ENABLED(CONFIG_RESUME_PATH_SAME_AS_BOOT) ||
-	     !IS_ENABLED(CONFIG_VBOOT_STARTS_IN_BOOTBLOCK)))
+            (!IS_ENABLED(CONFIG_RESUME_PATH_SAME_AS_BOOT) ||
+                !IS_ENABLED(CONFIG_VBOOT_STARTS_IN_BOOTBLOCK)) &&
+            !IS_ENABLED(CONFIG_MEASURED_BOOT))
 		init_tpm(s3wake);
+	printk(BIOS_DEBUG, "%s: romstage complete\n", __FILE__);
 }
 
 static int mrc_cache_verify_tpm_hash(const uint8_t *data, size_t size)
@@ -484,6 +487,17 @@ void fsp_memory_init(bool s3wake)
 	if (status != CB_SUCCESS)
 		die("Loading FSPM failed!\n");
 
+	if (IS_ENABLED(CONFIG_MEASURED_BOOT) && IS_ENABLED(CONFIG_LPC_TPM)) {
+		// we don't know if we are coming out of a resume
+		// at this point, but want to setup the tpm ASAP
+		init_tpm(0);
+		tlcl_lib_init();
+		const void * const bootblock = (const void*) 0xFFFFF800;
+		const unsigned bootblock_size = 0x800;
+		tlcl_measure(0, bootblock, bootblock_size);
+
+		tlcl_measure(1, _romstage, _eromstage - _romstage);
+	}
 	/* Signal that FSP component has been loaded. */
 	prog_segment_loaded(hdr.image_base, hdr.image_size, SEG_FINAL);
 
