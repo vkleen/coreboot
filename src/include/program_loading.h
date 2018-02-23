@@ -24,6 +24,8 @@ enum {
 	/* Last segment of program. Can be used to take different actions for
 	 * cache maintenance of a program load. */
 	SEG_FINAL = 1 << 0,
+	/* Indicate that the program segment should not be measured */
+	SEG_NO_MEASURE = 1 << 1,
 };
 
 enum prog_type {

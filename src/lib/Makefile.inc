@@ -57,8 +57,13 @@ verstage-$(CONFIG_TPM) += tlcl.c
 verstage-$(CONFIG_TPM2) += tpm2_marshaling.c
 verstage-$(CONFIG_TPM2) += tpm2_tlcl.c
 
-ifeq ($(CONFIG_VBOOT_SEPARATE_VERSTAGE),y)
+# Add the TPM support into the ROM stage for measuring the bootblock
 romstage-$(CONFIG_TPM) += tlcl.c
+romstage-$(CONFIG_TPM) += sha1.c
+ramstage-$(CONFIG_TPM) += tlcl.c
+ramstage-$(CONFIG_TPM) += sha1.c
+
+ifeq ($(CONFIG_VBOOT_SEPARATE_VERSTAGE),y)
 romstage-$(CONFIG_TPM2) += tpm2_marshaling.c
 romstage-$(CONFIG_TPM2) += tpm2_tlcl.c
 endif # CONFIG_VBOOT_SEPARATE_VERSTAGE

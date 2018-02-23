@@ -198,7 +198,7 @@ int rmodule_load(void *base, struct rmodule *module)
 	rmodule_clear_bss(module);
 
 	prog_segment_loaded((uintptr_t)module->location,
-				rmodule_memory_size(module), SEG_FINAL);
+				rmodule_memory_size(module), SEG_FINAL | SEG_NO_MEASURE);
 
 	return 0;
 }

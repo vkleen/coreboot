@@ -32,6 +32,7 @@
 #include <reset.h>
 #include <boot/tables.h>
 #include <program_loading.h>
+#include <tpm_lite/tlcl.h>
 #include <lib.h>
 #if IS_ENABLED(CONFIG_HAVE_ACPI_RESUME)
 #include <arch/acpi.h>
@@ -544,3 +545,13 @@ void boot_state_current_unblock(void)
 {
 	boot_state_unblock(current_phase.state_id, current_phase.seq);
 }
+
+// ramstage measurements go into PCR3 if we are doing measured boot
+void platform_segment_loaded(uintptr_t start, size_t size, int flags)
+{
+	if (IS_ENABLED(CONFIG_MEASURED_BOOT) && !(flags & SEG_NO_MEASURE))
+	{
+		tlcl_measure(3, (const void*) start, size);
+	}
+}
+
