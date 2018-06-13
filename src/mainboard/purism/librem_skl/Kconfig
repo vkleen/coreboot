@@ -17,6 +17,10 @@ config IRQ_SLOT_COUNT
 	int
 	default 18
 
+config ME_CLEANER_ARGS
+	string
+	default "-S -w MFS"
+
 config VARIANT_DIR
 	string
 	default "librem13v2" if BOARD_PURISM_LIBREM13_V2
