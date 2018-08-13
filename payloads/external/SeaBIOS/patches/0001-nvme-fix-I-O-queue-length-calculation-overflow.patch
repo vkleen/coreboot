@@ -1,0 +1,47 @@
+From a17975b5fe0cb2b17fdf0335430d5f4d2ab3ba4d Mon Sep 17 00:00:00 2001
+From: Matt DeVillier <matt.devillier@puri.sm>
+Date: Sun, 12 Aug 2018 15:26:59 -0500
+Subject: [PATCH 1/1] nvme: fix I/O queue length calculation overflow
+
+Commit cd47172 changed the I/O queue length calculation to use the
+Maximum Queue Entries Supported (MQES) value from the capabilities
+register, plus one, with a maximum value of NVME_PAGE_SIZE.
+
+An unintended effect from this is that a MQES value of 0xFFFF yields
+a length of zero, resulting in the queue allocation failing. Fix this
+by checking for a zero length when checking that the length exceeds
+NVME_PAGE_SIZE, and setting to NVME_PAGE_SIZE.
+
+TEST: build/boot on a Purism Librem13v2 with a MyDigitalSSD BPX NVMe
+drive, which reports a MQES of 0xFFFF. Verify NVMe drive present in
+boot menu and OS boots successfully.
+
+Signed-off-by: Matt DeVillier <matt.devillier@puri.sm>
+---
+ src/hw/nvme.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/src/hw/nvme.c b/src/hw/nvme.c
+index e6d739d..c2d6863 100644
+--- a/src/hw/nvme.c
++++ b/src/hw/nvme.c
+@@ -319,7 +319,7 @@ nvme_create_io_cq(struct nvme_ctrl *ctrl, struct nvme_cq *cq, u16 q_idx)
+     int rc;
+     struct nvme_sqe *cmd_create_cq;
+     u16 length = 1 + (ctrl->reg->cap & 0xffff);
+-    if (length > NVME_PAGE_SIZE / sizeof(struct nvme_cqe))
++    if (length == 0 || length > NVME_PAGE_SIZE / sizeof(struct nvme_cqe))
+         length = NVME_PAGE_SIZE / sizeof(struct nvme_cqe);
+
+     rc = nvme_init_cq(ctrl, cq, q_idx, length);
+@@ -363,7 +363,7 @@ nvme_create_io_sq(struct nvme_ctrl *ctrl, struct nvme_sq *sq, u16 q_idx, struct
+     int rc;
+     struct nvme_sqe *cmd_create_sq;
+     u16 length = 1 + (ctrl->reg->cap & 0xffff);
+-    if (length > NVME_PAGE_SIZE / sizeof(struct nvme_cqe))
++    if (length == 0 || length > NVME_PAGE_SIZE / sizeof(struct nvme_cqe))
+         length = NVME_PAGE_SIZE / sizeof(struct nvme_cqe);
+
+     rc = nvme_init_sq(ctrl, sq, q_idx, length, cq);
+--
+2.17.1
